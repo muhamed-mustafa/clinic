@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@clinic-microservices14/common": "^1.0.33"
+  }
+}

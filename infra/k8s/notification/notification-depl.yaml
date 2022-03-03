@@ -1,0 +1,37 @@
+apiVersion : apps/v1
+kind : Deployment
+metadata :
+  name : notification-depl
+spec :
+  replicas : 1
+  selector :
+    matchLabels :
+      app : notification
+  template :
+    metadata : 
+      labels :
+        app : notification
+    spec :
+      containers :
+        - name  : notification
+          image : muhammedmustafa/notification
+          env :
+            - name : NATS_CLIENT_ID
+              valueFrom :
+                fieldRef :
+                  fieldPath : metadata.name
+            - name  : NATS_URL
+              value : 'http://nats-srv:4222'
+            - name  : NATS_CLUSTER_ID
+              value : clinic
+            - name  : REDIS_HOST
+              value : notification-redis-srv
+            - name  : TWILIO_ACCOUNT_SID
+              value : AC40964f75d8df8dc8dfe1e787ce877eb3
+            - name  : TWILIO_AUTH_TOKEN
+              valueFrom :
+                secretKeyRef :
+                  name : twilio-auth-token
+                  key  : TWILIO_AUTH_TOKEN
+            - name  : TWILIO_PHONE_NUMBER
+              value : "+18623226948"

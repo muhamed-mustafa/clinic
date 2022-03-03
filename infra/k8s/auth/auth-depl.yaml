@@ -1,0 +1,70 @@
+apiVersion : apps/v1
+kind : Deployment
+metadata :
+  name : auth-depl
+spec :
+  replicas : 1
+  selector :
+    matchLabels :
+      app : auth
+  template :
+    metadata : 
+      labels :
+        app : auth
+    spec :
+      containers :
+        - name  : auth
+          image : muhammedmustafa/auth
+          env :
+            - name : NATS_CLIENT_ID
+              valueFrom :
+                fieldRef :
+                  fieldPath : metadata.name
+            - name  : NATS_URL
+              value : 'http://nats-srv:4222'
+            - name  : NATS_CLUSTER_ID
+              value : clinic
+            - name  : MONGO_URI
+              value : mongodb://auth-mongo-srv:27017/auth
+            - name  : CLOUDINARY_NAME
+              value : microservices
+            - name  : CLOUDINARY_API_KEY
+              value : "811727343751112"
+            - name  : CLOUDINARY_SECRET_KEY
+              valueFrom :
+                secretKeyRef :
+                  name  : cloudinary-secret
+                  key   : CLOUDINARY_SECRET_KEY
+            - name : JWT_KEY
+              valueFrom :
+                secretKeyRef :
+                  name  : jwt-secret
+                  key : JWT_KEY
+            - name  : MAIL_USER
+              value : "microservice.nodemailer@gmail.com"
+            - name: MAIL_PASS
+              valueFrom:
+                  secretKeyRef:
+                    name: mail-api-secret-pass
+                    key: MAIL_PASS
+            - name  : MAIL_SERVER_PORT
+              value : "465"
+            - name: PORT
+              value: "3e3"
+            - name: RESET_PASSWORD_EXPIRATION_KEY
+              value: "36e5"
+--- 
+
+apiVersion : v1
+kind : Service
+metadata : 
+  name : auth-srv
+spec :
+  type : ClusterIP
+  selector :
+    app : auth
+  ports :
+    - name : auth
+      protocol : TCP
+      port : 3000
+      targetPort : 3000

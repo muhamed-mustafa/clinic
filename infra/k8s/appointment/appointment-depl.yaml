@@ -1,0 +1,48 @@
+apiVersion : apps/v1
+kind : Deployment
+metadata :
+  name : appointment-depl
+spec :
+  replicas : 1
+  selector :
+    matchLabels :
+      app : appointment
+  template :
+    metadata : 
+      labels :
+        app : appointment
+    spec :
+      containers :
+        - name  : appointment
+          image : muhammedmustafa/appointment
+          env :
+            - name : NATS_CLIENT_ID
+              valueFrom :
+                fieldRef :
+                  fieldPath : metadata.name
+            - name  : NATS_URL
+              value : 'http://nats-srv:4222'
+            - name  : NATS_CLUSTER_ID
+              value : clinic
+            - name  : MONGO_URI
+              value : mongodb://appointment-mongo-srv:27017/appointment
+            - name : JWT_KEY
+              valueFrom :
+                secretKeyRef :
+                  name  : jwt-secret
+                  key : JWT_KEY
+--- 
+
+apiVersion : v1
+kind : Service
+metadata : 
+  name : appointment-srv
+spec :
+  type : ClusterIP
+  selector :
+    app : appointment
+  ports :
+    - name : appointment
+      protocol : TCP
+      port : 3000
+      targetPort : 3000

@@ -1,0 +1,31 @@
+apiVersion : apps/v1
+kind : Deployment
+metadata :
+  name : notification-redis-depl
+spec :
+  replicas : 1
+  selector :
+    matchLabels : 
+      app : notification-redis
+  template :
+    metadata :
+     labels :
+      app : notification-redis
+    spec :
+      containers :
+        - name  : notification-redis
+          image : redis
+--- 
+apiVersion : v1
+kind : Service
+metadata :
+  name : notification-redis-srv
+spec :
+  type : ClusterIP
+  selector :
+    app : notification-redis
+  ports :
+    - name : notification-redis
+      protocol : TCP
+      port : 6379
+      targetPort : 6379
